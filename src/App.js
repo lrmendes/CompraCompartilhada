@@ -1,25 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useFirestoreDocData, useFirestore, SuspenseWithPerf } from 'reactfire';
+import AppBarModel from "./components//AppBar";
+import CssBaseline from '@material-ui/core/CssBaseline';
+
+function Burrito() {
+  // lazy load the Firestore SDK
+  // and create a ref
+  const burritoRef = useFirestore()
+    .collection('tryreactfire')
+    .doc('burrito');
+
+  // subscribe to the doc. just one line!
+  // throws a Promise for Suspense to catch,
+  // and then streams live updates
+  const burrito = useFirestoreDocData(burritoRef);
+
+  return <p>The burrito is {burrito.yummy ? 'good' : 'bad'}!</p>;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  <React.Fragment>
+    <AppBarModel />
+  </React.Fragment>
   );
 }
 
