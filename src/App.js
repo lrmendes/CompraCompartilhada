@@ -1,6 +1,9 @@
-import React from 'react';
-import { useFirestoreDocData, useFirestore, SuspenseWithPerf } from 'reactfire';
+import React, {Suspense} from 'react';
+import { useFirestoreDocData, useFirestore, SuspenseWithPerf, AuthCheck } from 'reactfire';
+import { Switch, BrowserRouter, Route, Redirect } from "react-router-dom";
+import { createRoot } from 'react-dom';
 import AppBarModel from "./components//AppBar";
+import AuthPage from "./pages/Auth";
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 function Burrito() {
@@ -20,10 +23,18 @@ function Burrito() {
 
 function App() {
   return (
-  <React.Fragment>
-    <AppBarModel />
-  </React.Fragment>
+    <BrowserRouter>
+      <Switch>
+    <Suspense fallback={<h2>Carregando Firebase...</h2>}>
+      <AuthCheck fallback={<AuthPage />}>
+        <AppBarModel />
+      </AuthCheck>
+    </Suspense>
+    </Switch>
+    </BrowserRouter>
   );
 }
+
+//createRoot(document.getElementById('root')).render(<App />);
 
 export default App;

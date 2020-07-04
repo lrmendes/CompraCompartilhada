@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -6,7 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
+import {Grid,Divider, Box} from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -20,6 +20,12 @@ import Home from "../pages/Home";
 import Offers from "../pages/Offers";
 import { Router, Route, Link } from "react-router-dom";
 import { createBrowserHistory } from "history";
+
+import {
+    useAuth,
+    useFirestore,
+    useFirestoreDocData
+} from 'reactfire';
 
 const drawerWidth = 240;
 const history = createBrowserHistory();
@@ -63,10 +69,19 @@ const pages = [
 export default function PermanentDrawerLeft() {
   const [title, setTitle] = useState('Início');
   const classes = useStyles();
+  
+  const auth = useAuth();
+  const firestore = useFirestore();
 
   const onItemClick = title => () => {
     setTitle(title);
   };
+
+  const userRef = firestore
+  .collection('Users')
+  .doc(auth.currentUser.email);
+
+  const [user,setUser] = useState(useFirestoreDocData(userRef));
 
   return (
     <div className={classes.root}>
@@ -108,10 +123,36 @@ export default function PermanentDrawerLeft() {
             </ListItem>
           ))}
         </List>
+        <Divider />
+        <Grid container direction="column" style={{paddingLeft: "15px"}}>
+            <Box mt={1}>
+                <Typography variant="h6">Perfil:</Typography>
+            </Box>
+            <Box mt={1}>
+                <Typography>Usuário:</Typography>
+            </Box>
+            <Typography><b>{user.name}</b></Typography>
+            <Box mt={1}>
+                <Typography>CEP:</Typography>
+            </Box>
+            <Typography><b>{user.zip_code}</b></Typography>
+            <Box mt={1}>
+                <Typography>Cidade:</Typography>
+            </Box>
+            <Typography><b>{user.city}</b></Typography>
+            <Box mt={1}>
+                <Typography>Estado:</Typography>
+            </Box>
+            <Typography><b>{user.state}</b></Typography>
+            <Box mt={1}>
+
+            </Box>
+        </Grid>
+        <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" component={() => <Home user={user} />} />
             <Route path="/offers" component={Offers} />
       </main>
     </Router>
