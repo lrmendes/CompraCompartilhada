@@ -54,7 +54,6 @@ function Home({user = null, ...props}) {
       setRunOnce(false);
       refreshList();
     }
-    console.log("Rodou Effect");
     /*if (user == null || (Object.keys(user).length === 0 && user.constructor === Object) || user === undefined) {
       auth
       .signOut()
