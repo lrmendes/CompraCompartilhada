@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "firebase": "^7.15.5",
-    "homepage": "http://lrmendes.github.io/CompraCompartilhada",
+    "homepage": "https://lrmendes.github.io/CompraCompartilhada/",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",

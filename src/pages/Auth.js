@@ -36,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(3),
     },
+    form2: {
+        width: '100%', // Fix IE 11 issue.
+        marginTop: theme.spacing(3),
+    },
     submit: {
         margin: theme.spacing(3, 0, 2),
         minHeight: 50,
@@ -91,6 +95,8 @@ function AuthPage({...props}) {
     const [cep, setCep] = useState("");
     const [address, setAddress] = useState(null);
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const auth = useAuth();
     const firestore = useFirestore();
 
@@ -99,6 +105,7 @@ function AuthPage({...props}) {
     }, [address]);
 
     function handleRegister() {
+        setIsLoading(true);
         if (name === "" || !name) {
             return alert("O campo nome deve ser preenchido");
         }
@@ -122,6 +129,7 @@ function AuthPage({...props}) {
             .collection('Users').doc(email.toLocaleLowerCase()).get().then(res => {
                 if(res.exists === true) {
                     alert("Esse endereço de email foi cadastrado!");
+                    setIsLoading(false);
                 } else {
                     firestore
                     .collection('Users').doc(email.toLocaleLowerCase()).set(
@@ -129,6 +137,7 @@ function AuthPage({...props}) {
                     ).then(() => {
                         auth.createUserWithEmailAndPassword(email.toLocaleLowerCase(), senha)
                         .then(res => {
+                            setIsLoading(false);
                             // Registratin Sucessfull
                         }).catch(e => {
                             if (e.code === "auth/email-already-in-use") {
@@ -137,13 +146,16 @@ function AuthPage({...props}) {
                                 alert("Erro ao comunicar com o banco de dados!\nMsg: ",e.message);
                                 console.log("Erro1: ",e);
                             }
+                            setIsLoading(false);
                         });
                     }).catch(error2 => {
                         console.log("Erro2: ",error2);
+                        setIsLoading(false);
                     });
             }
         }).catch(error3 => {
             console.log("Erro3: ",error3);
+            setIsLoading(false);
         })
 
         /*auth.createUserWithEmailAndPassword(email, senha).then(res => {
@@ -174,8 +186,10 @@ function AuthPage({...props}) {
     }
 
     function handleLogin() {
+        setIsLoading(true);
         auth.signInWithEmailAndPassword(loginEmail,loginSenha).then(res => {
-            console.log("Entrou");
+            //console.log("Entrou");
+            setIsLoading(false);
         }).catch(error => {
             if (error.code === "auth/wrong-password") {
                 alert("Password incorreto!");
@@ -185,6 +199,7 @@ function AuthPage({...props}) {
                 alert("Não foi possível realizar o login!");
                 console.log(error);
             }
+            setIsLoading(false);
         })
     }
 
@@ -212,17 +227,17 @@ function AuthPage({...props}) {
                     </Grid>
                 </Grid>
                 { isLogin 
-                ? <form className={classes.form} noValidate>
+                ? <div className={classes.form} noValidate>
                     <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={12}>
                             <TextField
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="email"
+                                id="loginemail"
                                 label="Email"
-                                name="email"
-                                autoComplete="email"
+                                name="loginemail"
+                                value={loginEmail}
                                 onChange={(e) => setLoginEmail(e.target.value)}
                             />
                         </Grid>
@@ -231,17 +246,18 @@ function AuthPage({...props}) {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                name="password"
+                                name="loginpassword"
                                 label="Senha"
                                 type="password"
-                                id="password"
-                                autoComplete="current-password"
+                                id="loginpassword"
+                                value={loginSenha}
                                 onChange={(e) => setLoginSenha(e.target.value)}
                             />
                         </Grid>
                     </Grid>
                     <Button
                         fullWidth
+                        disabled={isLoading}
                         variant="contained"
                         color="primary"
                         className={classes.submit}
@@ -249,8 +265,8 @@ function AuthPage({...props}) {
                     >
                         CONECTAR
                     </Button>
-                </form>
-                : <form className={classes.form} noValidate>
+                </div>
+                : <div className={classes.form2} noValidate>
                 <Grid container alignItems="center" spacing={2}>
                     <Grid item xs={12}>
                         <TextField
@@ -259,8 +275,8 @@ function AuthPage({...props}) {
                             fullWidth
                             id="nome"
                             name="nome"
-                            autoComplete="nome"
                             label="Nome"
+                            value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
                     </Grid>
@@ -272,7 +288,7 @@ function AuthPage({...props}) {
                             id="email"
                             label="Email"
                             name="email"
-                            autoComplete="email"
+                            value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </Grid>
@@ -285,7 +301,6 @@ function AuthPage({...props}) {
                             label="Senha"
                             type="password"
                             id="password"
-                            autoComplete="current-password"
                             onChange={(e) => setSenha(e.target.value)}
                         />
                     </Grid>
@@ -294,11 +309,10 @@ function AuthPage({...props}) {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                name="password"
+                                name="passwordConfirm"
                                 label="Confirmação de Senha"
                                 type="password"
-                                id="password"
-                                autoComplete="current-password"
+                                id="passwordConfirm"
                                 onChange={(e) => setSenhaConfirm(e.target.value)}
                         />
                         </Grid>
@@ -337,6 +351,7 @@ function AuthPage({...props}) {
                 </Grid>
                 <Button
                     fullWidth
+                    disabled={isLoading}
                     variant="contained"
                     color="primary"
                     className={classes.submit}
@@ -344,7 +359,7 @@ function AuthPage({...props}) {
                 >
                     Cadastrar
                 </Button>
-            </form>
+            </div>
                 }
             </div>
         </Container >

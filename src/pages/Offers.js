@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Home({user = null, ...props}) {
+function Offers({user = null, ...props}) {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [data,setData] = useState(null);
@@ -66,11 +66,15 @@ function Home({user = null, ...props}) {
     //console.log("Rodou 1x");
   });
 
+  const simulateShipCost = (shipCost, quantity) => {
+    return ((shipCost * (1+( (quantity-1)/20)) ) / quantity).toFixed(2)
+  }
+
 
   const refreshList = () => {
     firestore.collection("Offers").get().then((querySnapshot) => {
       //setData(resp);
-      console.log(querySnapshot);
+      //console.log(querySnapshot);
       let offers = [];
       let locations = [];
       querySnapshot.forEach((documentSnapshot) => {
@@ -92,15 +96,17 @@ function Home({user = null, ...props}) {
           isLocal = true;
         }
 
-        offers.push({
-          ...documentSnapshot.data(),
-          id: documentSnapshot.id,
-          isInside: exists,
-          isLocal: isLocal,
-        });
+        if (data.participants.length <= 2) {
+          offers.push({
+            ...documentSnapshot.data(),
+            id: documentSnapshot.id,
+            isInside: exists,
+            isLocal: isLocal,
+          });
+        }
       });
-      console.log(offers);
-      console.log("Finalized");
+      //console.log(offers);
+      //console.log("Finalized");
 
       if (offers.length === 0) {
         alert("Nenhuma oferta foi encontrada!\nTente novamente mais tarde ou adicione ofertas!");
@@ -132,7 +138,7 @@ function Home({user = null, ...props}) {
       setData(offers);
       setOfferSize(offers.length);
     }
-    console.log("Rodou Filter");
+    //console.log("Rodou Filter");
   }
 
   const myUserData = useFirestore.FieldValue.arrayUnion({name: user.name, address: user.address, zip_code: user.zip_code, email: user.email});
@@ -237,9 +243,9 @@ function Home({user = null, ...props}) {
                                       <Grid item>
                                           <Grid container direction="column"  alignItems="stretch" justify="space-between">
                                           <Typography>Custos de Frete para essa Oferta:</Typography>
-                                          <Typography>1 Comprador: <b>R$ {productShipCost}</b></Typography>
-                                          <Typography>2 Compradores: <b>R$ {(productShipCost/2).toFixed(2)}</b> (para cada)</Typography>
-                                          <Typography>3 Compradores: <b>R$ {(productShipCost/3).toFixed(2)}</b> (para cada)</Typography>
+                                          <Typography color={ participants.length === 1 ? "primary" : "initial" }>1 Comprador: <b>R$ {productShipCost}</b></Typography>
+                                          <Typography color={ participants.length === 2 ? "primary" : "initial" }>2 Compradores: <b>R$ {simulateShipCost(productShipCost,2)}</b> (para cada)</Typography>
+                                          <Typography color={ participants.length === 3 ? "primary" : "initial" }>3 Compradores: <b>R$ {simulateShipCost(productShipCost,3)}</b> (para cada)</Typography>
                                           <Box mt={1}>
                                               <Typography color="primary"><b>{participants.length === 1 ? "1 pessoa já ingressou nessa oferta." : `${participants.length} pessoas já ingressaram nessa oferta.` }</b></Typography>
                                           </Box>
@@ -260,4 +266,4 @@ function Home({user = null, ...props}) {
   );
 }
 
-export default Home;
+export default Offers;

@@ -101,26 +101,35 @@ function Home({user = null, ...props}) {
         axios.get(`https://api.mercadolibre.com/sites/MLB/search?q=${searchAux}#json`)
         .then(async res => {
             let results = res.data;
-            console.log("Recebidos:",results.results.length)
+            //console.log("Recebidos:",results.results.length)
             results.results = results.results.filter(product => !product.shipping.free_shipping);
-            console.log("Frete pago:",results.results.length)
+            //console.log("Frete pago:",results.results.length)
             if (results.results.length >= 5) {
                 results.results = results.results.slice(0,4);
             }
-            console.log("Limite:",results.results.length)
-            console.log("Dados:",results.results)
+            //console.log("Limite:",results.results.length)
+            //console.log("Dados:",results.results)
+
+            let newResults = [];
 
             await Promise.all(results.results.map(async product => {    
-                console.log("Frete Calculed");
+                //console.log("Frete Calculed");
                 await axios.get(`https://api.mercadolibre.com/items/${product.id}/shipping_options?zip_code=${user.zip_code}`).then(resShip => {
                     product["shipObject"] = resShip.data.options[0];
-                    results.results[product] = product;
+                    newResults.push(product);
+                    //newResults[product].push({shipObject: resShip.data.options[0]});
+                    //results.results[product] = product;
+                    //console.log("Entrou: ",resShip.data);
                 }).catch(errorShip => {
-                    product["shipObject"] = null;
-                    results.results[product] = product;
+                    //product["shipObject"] = null;
+                    //results.results.remove(product);
+                    //results.results[product] = product;
+                    //console.log("ERRO: ", errorShip);
                 });
             }));
-            console.log("Setou Results");
+            //console.log("Setou Results");
+            results.results = newResults;
+            //console.log("Fim:", results);
             setData(results);
             setLoading(false);
 
@@ -129,10 +138,10 @@ function Home({user = null, ...props}) {
         });
 
     } else {
-        console.log("A busca exige algum termo e não pode ser igual a busca atual");
-        console.log(search);
-        console.log("aux: ",searchAux);
-        //alert("A busca exige algum termo e não pode ser igual a busca atual");
+        //console.log("A busca exige algum termo e não pode ser igual a busca atual");
+        //console.log(search);
+        //console.log("aux: ",searchAux);
+        alert("A busca exige algum termo e não pode ser igual a última pesquisa!");
     }
   }
 

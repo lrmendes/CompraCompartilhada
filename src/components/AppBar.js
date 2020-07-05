@@ -18,6 +18,7 @@ import LocalOfferOutlinedIcon from '@material-ui/icons/LocalOfferOutlined';
 
 import Home from "../pages/Home";
 import Offers from "../pages/Offers";
+import Me from "../pages/Me";
 import { Router, Route, Link } from "react-router-dom";
 import { createBrowserHistory } from "history";
 
@@ -67,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 const pages = [
     {id: 0, title: "Produtos", icon: <HomeOutlinedIcon /> , route: "/"},
     {id: 1, title: "Ofertas de Partilha", icon: <LocalOfferOutlinedIcon /> ,route: "/offers"},
-    {id: 2, title: "Minhas Ofertas", icon: <ShoppingCartOutlinedIcon />, route: "/cart"},
+    {id: 2, title: "Minhas Ofertas", icon: <ShoppingCartOutlinedIcon />, route: "/me"},
 ]
 
 export default function PermanentDrawerLeft() {
@@ -186,6 +187,7 @@ export default function PermanentDrawerLeft() {
         <div className={classes.toolbar} />
             <Route exact path="/" component={() => <Home user={user} />} />
             <Route path="/offers" component={() => <Offers user={user}/>} />
+            <Route path="/me" component={() => <Me user={user}/>} />
       </main>
     </Router>
     </div>
