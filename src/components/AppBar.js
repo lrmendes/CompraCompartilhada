@@ -6,7 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
-import {Grid,Divider, Box} from '@material-ui/core';
+import {Grid,Divider, Box, IconButton} from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
   defaultBlack: {
       color: "#000000",
+      flexGrow: 1,
   },
   drawerPaper: {
     width: drawerWidth,
@@ -56,14 +57,17 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+  },  
+  menuButton: {
+    marginRight: theme.spacing(2),
+    color: "#000000"
   },
 }));
 
 const pages = [
-    {id: 0, title: "Início", icon: <HomeOutlinedIcon /> , route: "/"},
+    {id: 0, title: "Produtos", icon: <HomeOutlinedIcon /> , route: "/"},
     {id: 1, title: "Ofertas de Partilha", icon: <LocalOfferOutlinedIcon /> ,route: "/offers"},
-    {id: 2, title: "Carrinho", icon: <ShoppingCartOutlinedIcon />, route: "/cart"},
-    {id: 3, title: "Sair", icon: <ExitToAppOutlinedIcon/>  ,route: "/logout"},
+    {id: 2, title: "Minhas Ofertas", icon: <ShoppingCartOutlinedIcon />, route: "/cart"},
 ]
 
 export default function PermanentDrawerLeft() {
@@ -77,11 +81,32 @@ export default function PermanentDrawerLeft() {
     setTitle(title);
   };
 
+  const doLogout = () => {
+    auth
+    .signOut()
+    .then(() => {
+        // Logout
+    });
+  }
+
   const userRef = firestore
   .collection('Users')
   .doc(auth.currentUser.email);
 
   const [user,setUser] = useState(useFirestoreDocData(userRef));
+
+  /*useEffect(() => {
+    if (user == null || (Object.keys(user).length === 0 && user.constructor === Object) || user === undefined) {
+      auth
+      .signOut()
+      .then(() => {
+          // Logout
+      });
+      alert("Erro ao conectar usuário.\nPor favor, faça login novamente!");
+    } else {
+      console.log(user);
+    }
+  });*/
 
   return (
     <div className={classes.root}>
@@ -92,6 +117,9 @@ export default function PermanentDrawerLeft() {
           <Typography className={classes.defaultBlack} variant="h6" noWrap>
             {title}
           </Typography>
+          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={doLogout}>
+            <ExitToAppOutlinedIcon />
+        </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -122,6 +150,10 @@ export default function PermanentDrawerLeft() {
               <ListItemText primary={title} />
             </ListItem>
           ))}
+            <ListItem button onClick={doLogout}>
+              <ListItemIcon><ExitToAppOutlinedIcon/></ListItemIcon>
+              <ListItemText primary={"Sair"} />
+            </ListItem>
         </List>
         <Divider />
         <Grid container direction="column" style={{paddingLeft: "15px"}}>
@@ -153,7 +185,7 @@ export default function PermanentDrawerLeft() {
       <main className={classes.content}>
         <div className={classes.toolbar} />
             <Route exact path="/" component={() => <Home user={user} />} />
-            <Route path="/offers" component={Offers} />
+            <Route path="/offers" component={() => <Offers user={user}/>} />
       </main>
     </Router>
     </div>

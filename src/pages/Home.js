@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useFirestoreDocData, useFirestore, SuspenseWithPerf } from 'reactfire';
+import { useFirestore } from 'reactfire';
 import { makeStyles } from '@material-ui/core/styles';
 import { Input, Grid, Paper, TextField, Typography, Button, Box, Card, CardContent, CardMedia, Divider } from '@material-ui/core';
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@material-ui/core';
 
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,11 +57,37 @@ function Home({user = null, ...props}) {
     const [loading, setLoading] = useState(false);
     const [data,setData] = useState(null);
 
+    const firestore = useFirestore();
+
     const createOffer = ({...product}) => {
-        console.log(user);
-        console.log(product);
+        //console.log(user);
+        //console.log(product);
         setSelectedData(product);
         setOpenDialog(true);
+    };
+
+    const registerNewOffer = () => {
+      // ID = Email_IDProduct (Garante um ID unico)
+      //          { productId: selectedData.id, productName: selectedData.name, productThumb: null, productShipCost: null, productCost: null, city: null, state: null, creatorName: null, creatorAddress: null, part1Name: null, part1ZipCode: }
+      var today = new Date();
+      var date = (today.getDate()+1)+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+      firestore
+      .collection('Offers').doc(user.email+"_"+selectedData.id).set(
+          { productId: selectedData.id, productName: selectedData.title, productThumb: selectedData.thumbnail, productShipCost: selectedData.shipObject.list_cost, creatorEmail: user.email, creatorName: user.name, 
+            vendorInfo: selectedData.address.city_name + " - " + selectedData.address.state_name, productCost: selectedData.price, city: user.city, endDate: date, state: user.state, participants:[{name: user.name, address: user.address, zip_code: user.zip_code, email: user.email}] }
+      ).then(() => {
+          setOpenDialog(false);
+          //console.log("Offer Registred");
+          //let newList = data;
+          //newList.results = newList.results.filter(product => product.id !== selectedData.id)
+          //setData(newList)
+          alert("Oferta Criada com Sucesso!");
+      }).catch(erro => {
+        //console.log("Offer Error");
+        setOpenDialog(false);
+        alert("Erro ao Criar a Oferta!");
+        //console.log(erro);
+      });
     };
 
     const simulateShipCost = (shipCost, quantity) => {
@@ -83,6 +108,7 @@ function Home({user = null, ...props}) {
                 results.results = results.results.slice(0,4);
             }
             console.log("Limite:",results.results.length)
+            console.log("Dados:",results.results)
 
             await Promise.all(results.results.map(async product => {    
                 console.log("Frete Calculed");
@@ -224,7 +250,7 @@ function Home({user = null, ...props}) {
           <Button onClick={() => setOpenDialog(false)} color="primary" variant="outlined">
             Cancelar
           </Button>
-          <Button onClick={() => setOpenDialog(false)} className={classes.modalButtonRemove} color="primary" variant="contained">
+          <Button onClick={() => registerNewOffer()} className={classes.modalButtonRemove} color="primary" variant="contained">
             Criar Oferta
           </Button>
         </DialogActions>

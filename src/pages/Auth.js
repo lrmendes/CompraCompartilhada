@@ -118,7 +118,41 @@ function AuthPage({...props}) {
             return alert("Você deve buscar um cep válido!");
         }
 
-        auth.createUserWithEmailAndPassword(email, senha).then(res => {
+        firestore
+            .collection('Users').doc(email.toLocaleLowerCase()).get().then(res => {
+                if(res.exists === true) {
+                    alert("Esse endereço de email foi cadastrado!");
+                } else {
+                    firestore
+                    .collection('Users').doc(email.toLocaleLowerCase()).set(
+                        { email: email, name: name, zip_code: address.zip_code, city: address.city.name, state: address.state.name, address: address.extended_attributes.address }
+                    ).then(() => {
+                        auth.createUserWithEmailAndPassword(email.toLocaleLowerCase(), senha)
+                        .then(res => {
+                            // Registratin Sucessfull
+                        }).catch(e => {
+                            if (e.code === "auth/email-already-in-use") {
+                                alert("Esse endereço de email foi cadastrado!");
+                            } else {
+                                alert("Erro ao comunicar com o banco de dados!\nMsg: ",e.message);
+                                console.log("Erro1: ",e);
+                            }
+                        });
+                    }).catch(error2 => {
+                        console.log("Erro2: ",error2);
+                    });
+            }
+        }).catch(error3 => {
+            console.log("Erro3: ",error3);
+        })
+
+        /*auth.createUserWithEmailAndPassword(email, senha).then(res => {
+            /*auth
+            .signOut()
+            .then(() => {
+                // Logout
+            });
+
             firestore
             .collection('Users').doc(email).set(
                 { email: email, name: name, zip_code: address.zip_code, city: address.city.name, state: address.state.name, address: address.extended_attributes.address }
@@ -136,6 +170,7 @@ function AuthPage({...props}) {
                 console.log(e);
             }
         });
+        */
     }
 
     function handleLogin() {
@@ -197,7 +232,7 @@ function AuthPage({...props}) {
                                 required
                                 fullWidth
                                 name="password"
-                                label="Password"
+                                label="Senha"
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
@@ -247,7 +282,7 @@ function AuthPage({...props}) {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Senha"
                             type="password"
                             id="password"
                             autoComplete="current-password"
@@ -260,7 +295,7 @@ function AuthPage({...props}) {
                                 required
                                 fullWidth
                                 name="password"
-                                label="Password Confirm"
+                                label="Confirmação de Senha"
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
