@@ -1,3 +1,57 @@
+# Compra Compartilhada: Módulo para E-Commerce
+O Compra Compartilhada é um projeto desenvolvido para o 3º MegaHack.<br/>O Desafio que buscamos solucionar foi o da empresa Mercado Livre.
+
+<b>O sistema Compra Compartilha pode ser acessado em: https://compracompartilhada-fba68.web.app/</b>
+
+A solução fornece um módulo que pode ser integrado aos sistemas de E-Commerce e traz ao usuário a possibilidade de ofertar um produto para que seu frete seja dividido entre demais compradores da mesma cidade.
+
+Para isso, o sistema busca produtos da API do mercado livre, e realiza o cálculo de frete advindo da mesma API.
+
+Após criar uma oferta, caso alguém de sua cidade queira comprar o mesmo produto, poderá ingressar em sua oferta e assim ambos irão dividir o valor do frete, tendo um custo de frete consideravelmente mais baixo para cada um. 
+
+Isso permite que o fator do frete seja reduzido na hora de decidir ao realizar uma compra online.
+
+#### Tecnologias Utilizadas
+
+* FrontEnd: <b>ReactJs</b>
+* Cloud (Back-End & Database): <b>Firebase</b>
+
+#### Executando
+O Projeto esta preparado para ser executado em Localhost, bastando baixar o projeto e inicia-lo com os comandos: ```npm install``` e ```npm start```.
+
+Toda a estrutura de autenticação, banco de dados e back-end encontra-se na nuvem (Firebase) e é setada automaticamente.
+
+#### Funcionalidades Implementadas:
+
+    * Login e Registro de Usuários.
+    * Visualização de Produtos (via API do Mercado Livre).
+    * Calcúlo de Frete Inicial (via API do Mercado Livre).
+    * Criação de Ofertas para Produtos.
+    * Ingressar em Ofertas existentes.
+    * Visualização de suas Ofertas e Ofertas que ingressou.
+    * Visualização do Custo do Frete (individual e compartilhado).
+    * Visualização da Oferta como vendedor (dados de todos os compradores).
+
+#### Uso de API's
+Todas as API's utilizadas no projeto são do Mercado Livre.
+Foram utilizadas as seguintes API's:
+- Busca de CEP.
+- Busca de Produtos (por termo pesquisa).
+- Cálculo de frete (por CEP do usuário).
+
+## Exemplos de Interfaces do Projeto
+
+#### Visualização de Produtos
+![](readme/Example2.png)
+
+#### Visualização de Ofertas
+![](readme/Example3.png)
+
+#### Visualização de Minhas Ofertas
+![](readme/Example4.png)
+
+---------------------------------------
+
 #### PROBLEMA: 
 
 Analisando grandes sites de promoções, como o PELANDO. É possível identificar rapidamente que muitas das promoções e itens vendidos na internet, não são comprados por boa parte dos internautas pelo alto custo de frete. 
